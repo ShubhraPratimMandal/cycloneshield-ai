@@ -89,7 +89,8 @@ c1.metric("Overall Risk Score", f"{score:.0f}/100")
 c2.metric("Risk Level", level)
 c3.metric("Wind Hazard", f"{wind} km/h")
 c4.metric("Storm Surge", f"{surge:.1f} m")
-st.markdown(f'<div style="margin:.6rem 0 1rem"><span class="risk-pill" style="background:#c62828">{level} RISK</span> <span style="margin-left:.6rem;color:#526170">{location}</span></div>', unsafe_allow_html=True)
+pill_color = {"LOW":"#2e7d32","MODERATE":"#ef9b20","HIGH":"#e85d04","CRITICAL":"#c62828"}[level]
+st.markdown(f'<div style="margin:.6rem 0 1rem"><span class="risk-pill" style="background:{pill_color}">{level} RISK</span> <span style="margin-left:.6rem;color:#526170">{location}</span></div>', unsafe_allow_html=True)
 
 left,right = st.columns([1.25,1])
 with left:
@@ -107,8 +108,9 @@ with right:
         st.progress(int(value), text=f"{name}: {value:.0f}/100")
 
 st.subheader("🗺️ Interactive infrastructure risk map")
+st.caption("Base map: OpenStreetMap. Forecast markers are synthetic demonstration points for the selected assessment.")
 np.random.seed(42)
-m = folium.Map(location=[loc["lat"],loc["lon"]],zoom_start=9,tiles="CartoDB positron")
+m = folium.Map(location=[loc["lat"],loc["lon"]],zoom_start=9,tiles="OpenStreetMap",control_scale=True)
 folium.Marker([loc["lat"],loc["lon"]],tooltip=f"{location}: {score:.0f}/100 {level}",popup=f"<b>{location}</b><br>Risk score: {score:.0f}/100<br>Risk level: {level}",icon=folium.Icon(color="red" if score>=50 else "orange",icon="warning-sign")).add_to(m)
 for _ in range(55):
     lat,lon = loc["lat"]+np.random.normal(0,.18), loc["lon"]+np.random.normal(0,.20)
